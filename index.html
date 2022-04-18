@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+  <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css" />
+  <title>地图显示</title>
+  <style>
+    html,
+    body,
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <dib id="option">
+    <button class="GetMyLocation">定位到当前ip</button>
+    <button class="lock-bounds">限定地图显示范围</button>
+    <button class="add-marker">添加Marker</button>
+  </dib>
+  <div id="container"></div>
+  <!-- 加载地图JSAPI脚本 -->
+  <script src="https://webapi.amap.com/maps?v=2.0&key=1fb89e82703e457ed614b790e3e275fa"></script>
+  <script>
+    // 创建一个map
+    const el = 'container'
+    const config = {
+      viewMode: '2D', // 默认使用 2D 模式，如果希望使用带有俯仰角的 3D 模式，请设置 viewMode: '3D',
+      zoom: 11, //初始化地图层级
+    }
+    var map = new AMap.Map('container', config);
+  </script>
+  <script>
+    var center = []
+    function GetMyLocation() {
+      const ipUrl = 'https://restapi.amap.com/v3/ip?ip=117.136.103.248&key=7f4153ac9961651d9836f39b96a1f5dd&output=json'
+      fetch(ipUrl).then(function (response) {
+        return response.json()
+      }).then(res => {
+        console.log(res)
+        center = res.rectangle.split(';')[0].split(',')
+        // 设置地图的中心点
+
+      })
+    }
+    GetMyLocation()
+  </script>
+  <script>
+    document.querySelector('.GetMyLocation').addEventListener('click', () => {
+      map.setCenter(center)
+    })
+    document.querySelector('.lock-bounds').addEventListener('click', () => {
+      var bounds = map.getBounds();
+      console.log(map)
+      map.setLimitBounds(bounds);
+    })
+    // 
+    var marker = new AMap.Marker({
+      // 图片
+      icon: "https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+      // 位置
+      position: [116.405467, 39.907761],
+    });
+    const extData = {
+      id: new Date(),
+      name: '张三',
+      age: 18
+    }
+    marker.setExtData(extData)
+    marker.on('click', res => {
+      const extData = res.target.getExtData()
+      console.log('点击了marker', extData)
+    })
+    document.querySelector(".add-marker").onclick = function () {
+      map.add(marker);
+      map.setFitView();
+    }
+  </script>
+</body>
+
+</html>
